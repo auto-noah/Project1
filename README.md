@@ -16,6 +16,6 @@ Clone the repository using git:
 ```bash
 git clone https://gitlab.com/auto-noah/Project1.git
 cd Project1
-'''
+```
 
 Then open **Project.sln** within Visual Studio, change from running in x64 to x86, and enjoy :).
