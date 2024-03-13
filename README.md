@@ -18,4 +18,8 @@ git clone https://gitlab.com/auto-noah/Project1.git
 cd Project1
 ```
 
-Then open **Project.sln** within Visual Studio, change from running in x64 to x86, and enjoy :).
+Then open **Project.sln** within Visual Studio, change your configuration from running in x64 to x86, and compile.
+
+#### UI
+
+There is a **Render** menu option located at the top of the window. When selecting the drop down option **RayTrace**, you change from viewing an OpenGL rendering to our custom raytracing render.
