@@ -130,9 +130,7 @@ bool CMyRaytraceRenderer::RendererEnd()
 				CGrMaterial* material;
 				CGrTexture* texture;
 				CGrPoint texcoord;
-
-				m_intersection.IntersectInfo(ray, nearest, t,
-					N, material, texture, texcoord);
+				m_intersection.IntersectInfo(ray, nearest, t, N, material, texture, texcoord);
 
 				//
 				// Custom Raytracer Lighting Code (BROKEN ATM)
@@ -159,7 +157,7 @@ bool CMyRaytraceRenderer::RendererEnd()
 					// Offset the origin to avoid self-intersection
 					CRay shadowRay(intersect + N * 0.001, lightDir); 
 
-					// Check if the shadow ray hits any object before reaching the light
+					// Check if the shadow ray hits any object before reaching the light (ShadowFeeler)
 					const CRayIntersection::Object* shadowNearest; 
 					if (!m_intersection.Intersect(shadowRay, lightDistance, nearest, shadowNearest, t, intersect)) 
 					{
