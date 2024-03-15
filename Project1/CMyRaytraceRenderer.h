@@ -30,5 +30,6 @@ public:
     virtual void RendererTranslate(double x, double y, double z);
     void RendererEndPolygon();
 
+    CGrPoint CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir);
 };
 

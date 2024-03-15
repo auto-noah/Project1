@@ -134,8 +134,43 @@ bool CMyRaytraceRenderer::RendererEnd()
 				m_intersection.IntersectInfo(ray, nearest, t,
 					N, material, texture, texcoord);
 
+				//
+				// Custom Raytracer Lighting Code (BROKEN ATM)
+				//
+
+				CGrPoint color = material->Ambient(); // Start with the ambient light
+
+				// Iterate over all lights in the renderer
+				for (int i = 0; i < LightCnt(); ++i) 
+				{
+					// Get current light and its direction
+					const Light& light = GetLight(i); 
+					CGrPoint lightDir = light.m_pos - intersect; 
+
+					// Calculate the length of the light direction vector
+					double lightDistance = sqrt(lightDir.X() * lightDir.X() + lightDir.Y() * lightDir.Y() + lightDir.Z() * lightDir.Z()); 
+
+					// Normalize the light direction vector
+					if (lightDistance != 0) // Avoid division by zero 
+					{
+						lightDir = CGrPoint(lightDir.X() / lightDistance, lightDir.Y() / lightDistance, lightDir.Z() / lightDistance); 
+					}
+
+					// Offset the origin to avoid self-intersection
+					CRay shadowRay(intersect + N * 0.001, lightDir); 
+
+					// Check if the shadow ray hits any object before reaching the light
+					const CRayIntersection::Object* shadowNearest; 
+					if (!m_intersection.Intersect(shadowRay, lightDistance, nearest, shadowNearest, t, intersect)) 
+					{
+						// If no intersection, the point is not in shadow for this light
+						color += CalculateLighting(N, material, light, lightDir);
+					}
+				}
+
 				if (material != NULL)
 				{
+					// Convert color to bytes and write to image buffer
 					m_rayimage[r][c * 3] = BYTE(material->Diffuse(0) * 255);
 					m_rayimage[r][c * 3 + 1] = BYTE(material->Diffuse(1) * 255);
 					m_rayimage[r][c * 3 + 2] = BYTE(material->Diffuse(2) * 255);
@@ -159,4 +194,14 @@ bool CMyRaytraceRenderer::RendererEnd()
 	}
 
 	return true;
+}
+
+CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir)
+{
+	// Calculate the diffuse and specular contribution from the light
+	// ... (implement lighting calculation here)
+
+	// return lightingColor;
+
+	return CGrPoint(0., 0., 0., 1.0);
 }
