@@ -138,7 +138,7 @@ CChildView::CChildView()
 
 	// Load floor texture
 	m_rwtiletex.LoadFile(L"textures/redwhitetile.bmp");
-
+	
 	// Define the vertices of the floor
 	double f0[] = { -22, -10, -15 }; // Bottom-left corner 
 	double f1[] = {  15, -10, -15 }; // Bottom-right corner 
@@ -196,8 +196,17 @@ CChildView::CChildView()
 
 CChildView::~CChildView()
 {
+	// delete image allocation
+	if (m_raytrace)
+		DeleteRaytraceImage();
 }
 
+void CChildView::DeleteRaytraceImage()
+{
+	// deallocate memory
+	delete[] m_rayimage[0];
+	delete[] m_rayimage;
+}
 
 BEGIN_MESSAGE_MAP(CChildView, COpenGLWnd)
 	ON_WM_PAINT()
@@ -351,7 +360,10 @@ void CChildView::OnRenderRaytrace()
 	m_raytrace = !m_raytrace;
 	Invalidate();
 	if (!m_raytrace)
+	{
+		DeleteRaytraceImage();
 		return;
+	}
 
 	GetSize(m_rayimagewidth, m_rayimageheight);
 
