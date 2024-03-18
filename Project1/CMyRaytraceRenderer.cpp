@@ -136,33 +136,36 @@ bool CMyRaytraceRenderer::RendererEnd()
 				// Custom Raytracer Lighting Code (BROKEN ATM)
 				//
 
-				CGrPoint color = material->Ambient(); // Start with the ambient light
+				CGrPoint color = CGrPoint(0., 0., 0., 1.0);
+				if (material != NULL) {
+					color = material->Ambient(); // Start with the ambient light if ray hit material
+				}
 
 				// Iterate over all lights in the renderer
-				for (int i = 0; i < LightCnt(); ++i) 
+				for (int i = 0; i < LightCnt(); ++i)  
 				{
 					// Get current light and its direction
 					const Light& light = GetLight(i); 
-					CGrPoint lightDir = light.m_pos - intersect; 
+					CGrPoint lightDir = light.m_pos - intersect;  
 
 					// Calculate the length of the light direction vector
-					double lightDistance = sqrt(lightDir.X() * lightDir.X() + lightDir.Y() * lightDir.Y() + lightDir.Z() * lightDir.Z()); 
+					double lightDistance = sqrt(lightDir.X() * lightDir.X() + lightDir.Y() * lightDir.Y() + lightDir.Z() * lightDir.Z());  
 
 					// Normalize the light direction vector
-					if (lightDistance != 0) // Avoid division by zero 
+					if (lightDistance != 0) // Avoid division by zero  
 					{
-						lightDir = CGrPoint(lightDir.X() / lightDistance, lightDir.Y() / lightDistance, lightDir.Z() / lightDistance); 
+						lightDir = CGrPoint(lightDir.X() / lightDistance, lightDir.Y() / lightDistance, lightDir.Z() / lightDistance);  
 					}
 
 					// Offset the origin to avoid self-intersection
-					CRay shadowRay(intersect + N * 0.001, lightDir); 
+					CRay shadowRay(intersect + N * 0.001, lightDir);  
 
 					// Check if the shadow ray hits any object before reaching the light (ShadowFeeler)
 					const CRayIntersection::Object* shadowNearest; 
-					if (!m_intersection.Intersect(shadowRay, lightDistance, nearest, shadowNearest, t, intersect)) 
+					if (!m_intersection.Intersect(shadowRay, lightDistance, nearest, shadowNearest, t, intersect))  
 					{
 						// If no intersection, the point is not in shadow for this light
-						color += CalculateLighting(N, material, light, lightDir);
+						color += CalculateLighting(N, material, light, lightDir); 
 					}
 				}
 
