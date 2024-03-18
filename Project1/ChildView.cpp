@@ -38,56 +38,56 @@ CChildView::CChildView()
 	//
 
 	// Load texture for pyramid
-	//m_marbletex.LoadFile(L"textures/marble10.bmp");
+	m_marbletex.LoadFile(L"textures/marble10.bmp");
 
-	//// Define the vertices of the pyramid
-	//double p0[] = { -19, -10,  0 }; // Bottom-left of base
-	//double p1[] = {  -9, -10,  0 }; // Bottom-right of base
-	//double p2[] = {  -9, -10, 10 }; // Top-right of base
-	//double p3[] = { -19, -10, 10 }; // Top-left of base
-	//double p4[] = { -14,   0,  5 }; // Apex
-	//
-	//// Base
-	//CGrPtr<CGrPolygon> base = new CGrPolygon(p0, p1, p2, p3);
-	//base->Texture(&m_marbletex); // Set texture 
-	//base->AddTexVertex3d(p0[0], p0[1], p0[2], 0.0, 0.0); 
-	//base->AddTexVertex3d(p1[0], p1[1], p1[2], 1.0, 0.0); 
-	//base->AddTexVertex3d(p2[0], p2[1], p2[2], 1.0, 1.0);
-	//base->AddTexVertex3d(p3[0], p3[1], p3[2], 0.0, 1.0);
-	//base->ComputeNormal(); // Ensure normal is correct
-	//scene->Child(base);
-	//// Side 1
-	//CGrPtr<CGrPolygon> side1 = new CGrPolygon;
-	//side1->AddVertices3(p1, p0, p4, true); // True to compute normal 
-	//side1->Texture(&m_marbletex); 
-	//side1->AddTexVertex3d(p1[0], p1[1], p1[2], 0.0, 0.0); 
-	//side1->AddTexVertex3d(p0[0], p0[1], p0[2], 1.0, 0.0); 
-	//side1->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
-	//scene->Child(side1);
-	//// Side 2
-	//CGrPtr<CGrPolygon> side2 = new CGrPolygon;
-	//side2->AddVertices3(p2, p1, p4, true);
-	//side2->Texture(&m_marbletex); 
-	//side2->AddTexVertex3d(p2[0], p2[1], p2[2], 0.0, 0.0); 
-	//side2->AddTexVertex3d(p1[0], p1[1], p1[2], 1.0, 0.0); 
-	//side2->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
-	//scene->Child(side2);
-	//// Side 3
-	//CGrPtr<CGrPolygon> side3 = new CGrPolygon;
-	//side3->AddVertices3(p3, p2, p4, true);
-	//side3->Texture(&m_marbletex); 
-	//side3->AddTexVertex3d(p3[0], p3[1], p3[2], 0.0, 0.0); 
-	//side3->AddTexVertex3d(p2[0], p2[1], p2[2], 1.0, 0.0); 
-	//side3->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
-	//scene->Child(side3);
-	//// Side 4
-	//CGrPtr<CGrPolygon> side4 = new CGrPolygon;
-	//side4->AddVertices3(p0, p3, p4, true);
-	//side4->Texture(&m_marbletex);
-	//side4->AddTexVertex3d(p0[0], p0[1], p0[2], 0.0, 0.0); 
-	//side4->AddTexVertex3d(p3[0], p3[1], p3[2], 1.0, 0.0); 
-	//side4->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
-	//scene->Child(side4);
+	// Define the vertices of the pyramid
+	double p0[] = { -19, -10,  0 }; // Bottom-left of base
+	double p1[] = {  -9, -10,  0 }; // Bottom-right of base
+	double p2[] = {  -9, -10, 10 }; // Top-right of base
+	double p3[] = { -19, -10, 10 }; // Top-left of base
+	double p4[] = { -14,   0,  5 }; // Apex
+	
+	// Base
+	CGrPtr<CGrPolygon> base = new CGrPolygon(p0, p1, p2, p3);
+	base->Texture(&m_marbletex); // Set texture 
+	base->AddTexVertex3d(p0[0], p0[1], p0[2], 0.0, 0.0); 
+	base->AddTexVertex3d(p1[0], p1[1], p1[2], 1.0, 0.0); 
+	base->AddTexVertex3d(p2[0], p2[1], p2[2], 1.0, 1.0);
+	base->AddTexVertex3d(p3[0], p3[1], p3[2], 0.0, 1.0);
+	base->ComputeNormal(); // Ensure normal is correct
+	scene->Child(base);
+	// Side 1
+	CGrPtr<CGrPolygon> side1 = new CGrPolygon;
+	side1->AddVertices3(p1, p0, p4, true); // True to compute normal 
+	side1->Texture(&m_marbletex); 
+	side1->AddTexVertex3d(p1[0], p1[1], p1[2], 0.0, 0.0); 
+	side1->AddTexVertex3d(p0[0], p0[1], p0[2], 1.0, 0.0); 
+	side1->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
+	scene->Child(side1);
+	// Side 2
+	CGrPtr<CGrPolygon> side2 = new CGrPolygon;
+	side2->AddVertices3(p2, p1, p4, true);
+	side2->Texture(&m_marbletex); 
+	side2->AddTexVertex3d(p2[0], p2[1], p2[2], 0.0, 0.0); 
+	side2->AddTexVertex3d(p1[0], p1[1], p1[2], 1.0, 0.0); 
+	side2->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
+	scene->Child(side2);
+	// Side 3
+	CGrPtr<CGrPolygon> side3 = new CGrPolygon;
+	side3->AddVertices3(p3, p2, p4, true);
+	side3->Texture(&m_marbletex); 
+	side3->AddTexVertex3d(p3[0], p3[1], p3[2], 0.0, 0.0); 
+	side3->AddTexVertex3d(p2[0], p2[1], p2[2], 1.0, 0.0); 
+	side3->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
+	scene->Child(side3);
+	// Side 4
+	CGrPtr<CGrPolygon> side4 = new CGrPolygon;
+	side4->AddVertices3(p0, p3, p4, true);
+	side4->Texture(&m_marbletex);
+	side4->AddTexVertex3d(p0[0], p0[1], p0[2], 0.0, 0.0); 
+	side4->AddTexVertex3d(p3[0], p3[1], p3[2], 1.0, 0.0); 
+	side4->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
+	scene->Child(side4);
 
 	//
 	// Add a Tetrahedron

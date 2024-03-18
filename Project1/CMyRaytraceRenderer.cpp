@@ -204,6 +204,8 @@ double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPo
 {
 	// Calculate diffuse and specular components
 
+	// lightDir (s) and normal (n) are normalized before being inputted
+
 	//vec3 s = normalize(lightDir);
 	//vec3 v = normalize(-fPosition);
 	//vec3 n = normalize(fNormal);
@@ -225,22 +227,12 @@ CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* 
 	// ... (implement lighting calculation here)
 
 	// return lightingColor;
-	
 
 	// Get diffuse and specular components
-
-	// The values for ka, kd, and ks came out of my ass
+	// The values for ka, kd, and ks are most likely wrong
 	double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1.0, 0.3, 0.3, 0.7, material->Shininess());
 
 	// Apply lighting
-
-	//vec2 blinnPhongDir(vec3 lightDir, float lightInt, float Ka, float Kd, float Ks, float shininess)
-	//vec2 shading = blinnPhongDir(lightDirection, 1., 0.3, 0.3, 0.7, 200.);
-	//gl_FragColor = vec4(shading *0.7, shading *1., shading *0.7, 1.) * texture2D(uSampler, fUV)+ vec4(0.2, 0.2, 0.2, 0.); // previous
-	// 
 	//gl_FragColor = vec4(shading[0] * vec3(1., 1., 1.) + shading[1] * vec3(1., 1., 1.), 1.0) * texture2D(uSampler, fUV) + vec4(0.2, 0.2, 0.2, 0.);
-
 	return (CGrPoint(1., 1., 1., 1.) * diffuseAndSpecular[0]) + (CGrPoint(1., 1., 1.) * diffuseAndSpecular[1]);
-
-	//return CGrPoint(0., 0., 0., 1.0);
 }
