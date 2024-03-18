@@ -97,6 +97,11 @@ void CMyRaytraceRenderer::RendererEndPolygon()
     m_intersection.PolygonEnd();
 }
 
+void CMyRaytraceRenderer::RayColor(const CRay& p_ray, CGrPoint& p_color, int p_recurse, const CRayIntersection::Object* p_ignore)
+{
+
+}
+
 bool CMyRaytraceRenderer::RendererEnd()
 {
 	m_intersection.LoadingComplete();
@@ -111,7 +116,7 @@ bool CMyRaytraceRenderer::RendererEnd()
 	{
 		for (int c = 0; c < m_rayimagewidth; c++)
 		{
-			//double colorTotal[3] = { 0, 0, 0 }; // This line seems pointless
+			double colorTotal[3] = { 0, 0, 0 }; // This line seems pointless
 
 			double x = xmin + (c + 0.5) / m_rayimagewidth * xwid;
 			double y = ymin + (r + 0.5) / m_rayimageheight * yhit;
@@ -135,15 +140,12 @@ bool CMyRaytraceRenderer::RendererEnd()
 
 				if (material != NULL)
 				{
-
 					//
-					// Custom Raytracer Lighting Code (BROKEN ATM)
+					// Compute Ray Color
 					//
 
 					// Note that material might be NULL
 					CGrPoint color = material->Ambient(); // Start with the ambient light
-
-
 
 					// Iterate over all lights in the renderer
 					for (int i = 0; i < LightCnt(); ++i) 
@@ -171,20 +173,17 @@ bool CMyRaytraceRenderer::RendererEnd()
 							// If no intersection, the point is not in shadow for this light
 							color += CalculateLighting(N, material, light, lightDir);
 						}
-
 					}
-
 				
 					// Convert color to bytes and write to image buffer
 					m_rayimage[r][c * 3] = BYTE(material->Diffuse(0) * color[0] * 255); // todo the math here might be janky and it might be going over 255
 					m_rayimage[r][c * 3 + 1] = BYTE(material->Diffuse(1) * color[1] * 255); // I also don't think the lighting application is calculated correctly
 					m_rayimage[r][c * 3 + 2] = BYTE(material->Diffuse(2) * color[2] * 255);
-
 				}
 			}
 			else
 			{
-				// We hit nothing...
+				// We hit nothing... set to background color
 				m_rayimage[r][c * 3] = 0;
 				m_rayimage[r][c * 3 + 1] = 0;
 				m_rayimage[r][c * 3 + 2] = 0;
@@ -213,7 +212,7 @@ double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPo
 	//vec3 n = normalize(fNormal);
 	//vec3 h = normalize(v + s);
 	CGrPoint h = Normalize3(lightDir); // <-- this still needs the -fPosition aspect
-
+	
 	//float diffuse = Ka + Kd * lightInt * max(0.0, dot(n, s));
 	double diffuse = Ka + Kd * lightInt * max(0.0, Dot3(normal, lightDir));
 	//float spec = Ks * pow(max(0.0, dot(n, h)), shininess);

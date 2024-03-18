@@ -30,6 +30,8 @@ public:
     virtual void RendererTranslate(double x, double y, double z);
     void RendererEndPolygon();
 
+    void RayColor(const CRay& p_ray, CGrPoint& p_color, int p_recurse, const CRayIntersection::Object* p_ignore);
+
     CGrPoint CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir);
 
     double* blinnPhongDir(const CGrPoint& lightDir, const CGrPoint& normal, float lightInt, float Ka, float Kd, float Ks, float shininess);
