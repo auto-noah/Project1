@@ -132,6 +132,7 @@ bool CMyRaytraceRenderer::RendererEnd()
 				CGrPoint texcoord;
 				m_intersection.IntersectInfo(ray, nearest, t, N, material, texture, texcoord);
 
+
 				if (material != NULL)
 				{
 
@@ -170,6 +171,7 @@ bool CMyRaytraceRenderer::RendererEnd()
 							// If no intersection, the point is not in shadow for this light
 							color += CalculateLighting(N, material, light, lightDir);
 						}
+
 					}
 
 				
