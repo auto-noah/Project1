@@ -31,5 +31,7 @@ public:
     void RendererEndPolygon();
 
     CGrPoint CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir);
+
+    double* blinnPhongDir(const CGrPoint& lightDir, const CGrPoint& normal, float lightInt, float Ka, float Kd, float Ks, float shininess);
 };
 

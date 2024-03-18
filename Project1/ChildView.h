@@ -38,6 +38,7 @@ private:
 public:
 	void OnGLDraw(CDC* pDC);
 	void ConfigureRenderer(CGrRenderer* p_renderer);
+	void DeleteRaytraceImage();
 	
 // Overrides
 	protected:
