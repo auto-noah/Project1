@@ -223,24 +223,13 @@ double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPo
 	double diffuse = Ka + Kd * lightInt * max(0.0, Dot3(normal, lightDir));
 	//float spec = Ks * pow(max(0.0, dot(n, h)), shininess);
 	double spec = Ks * pow(max(0.0, Dot3(normal, h)), shininess);
-	//return vec2(diffuse, spec);
 
+	//return vec2(diffuse, spec);
 	return new double[2] { diffuse, spec };
 }
 
 CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir)
 {
-	/*// Get diffuse and specular components
-	// The values for ka, kd, and ks are most likely wrong
-    if (material != NULL) {
-
-    }
-	double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1.0, 0.3, 0.3, 0.7, material->Shininess());
-
-	// Apply lighting
-	//gl_FragColor = vec4(shading[0] * vec3(1., 1., 1.) + shading[1] * vec3(1., 1., 1.), 1.0) * texture2D(uSampler, fUV) + vec4(0.2, 0.2, 0.2, 0.);
-	return (CGrPoint(1., 1., 1., 1.) * diffuseAndSpecular[0]) + (CGrPoint(1., 1., 1.) * diffuseAndSpecular[1]);*/
-
     // Default values for lighting components
     const float defaultKa = 0.3;
     const float defaultKd = 0.7;
@@ -254,7 +243,7 @@ CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* 
     float shininess = (material != nullptr) ? material->Shininess() : defaultShininess;
 
     // Call blinnPhongDir with either the material's properties or the default values
-    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1.0, Ka, Kd, Ks, shininess);
+    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, .01, Ka, Kd, Ks, shininess); // Light Intesity needs to be figured out (1.0 value whites out the scene)
 
     // Create the color based on the diffuse and specular components
     CGrPoint color(diffuseAndSpecular[0], diffuseAndSpecular[0], diffuseAndSpecular[0]);

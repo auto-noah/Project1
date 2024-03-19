@@ -89,48 +89,48 @@ CChildView::CChildView()
 	//side4->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
 	//scene->Child(side4);
 
-	////
-	//// Add a Tetrahedron
-	////
 	//
-	//// Tetrahedron vertices
-	//double t0[] = {   8, -10, -10 }; // Base vertex 1
-	//double t1[] = {  13, -10,  -5 }; // Base vertex 2
-	//double t2[] = {   3, -10,  -5 }; // Base vertex 3
-	//double t3[] = {   8,  -4,  -5 }; // Apex 
+	// Add a Tetrahedron
+	//
+	
+	// Tetrahedron vertices
+	/*double t0[] = {   8, -10, -10 }; // Base vertex 1
+	double t1[] = {  13, -10,  -5 }; // Base vertex 2
+	double t2[] = {   3, -10,  -5 }; // Base vertex 3
+	double t3[] = {   8,  -4,  -5 }; // Apex 
 
-	//// Base
-	//CGrPtr<CGrPolygon> tetraBase = new CGrPolygon;
-	//tetraBase->Texture(&m_woodtex);
-	//tetraBase->AddTexVertex3d(t0[0], t0[1], t0[2], 0.0, 0.0); 
-	//tetraBase->AddTexVertex3d(t1[0], t1[1], t1[2], 1.0, 0.0); 
-	//tetraBase->AddTexVertex3d(t2[0], t2[1], t2[2], 0.5, 1.0); 
-	//tetraBase->ComputeNormal(); 
-	//scene->Child(tetraBase); 
-	//// Face 1
-	//CGrPtr<CGrPolygon> tetraFace1 = new CGrPolygon;
-	//tetraFace1->Texture(&m_woodtex);
-	//tetraFace1->AddTexVertex3d(t1[0], t1[1], t1[2], 0.0, 0.0); 
-	//tetraFace1->AddTexVertex3d(t0[0], t0[1], t0[2], 1.0, 0.0); 
-	//tetraFace1->AddTexVertex3d(t3[0], t3[1], t3[2], 0.5, 1.0);
-	//tetraFace1->ComputeNormal();
-	//scene->Child(tetraFace1);
-	//// Face 2 
-	//CGrPtr<CGrPolygon> tetraFace2 = new CGrPolygon;
-	//tetraFace2->Texture(&m_woodtex);
-	//tetraFace2->AddTexVertex3d(t2[0], t2[1], t2[2], 0.0, 0.0); 
-	//tetraFace2->AddTexVertex3d(t1[0], t1[1], t1[2], 1.0, 0.0); 
-	//tetraFace2->AddTexVertex3d(t3[0], t3[1], t3[2], 0.5, 1.0);
-	//tetraFace2->ComputeNormal();
-	//scene->Child(tetraFace2);
-	//// Face 3 
-	//CGrPtr<CGrPolygon> tetraFace3 = new CGrPolygon;
-	//tetraFace3->Texture(&m_woodtex);
-	//tetraFace3->AddTexVertex3d(t0[0], t0[1], t0[2], 0.0, 0.0);
-	//tetraFace3->AddTexVertex3d(t2[0], t2[1], t2[2], 1.0, 0.0);
-	//tetraFace3->AddTexVertex3d(t3[0], t3[1], t3[2], 0.5, 1.0);
-	//tetraFace3->ComputeNormal();
-	//scene->Child(tetraFace3);
+	// Base
+	CGrPtr<CGrPolygon> tetraBase = new CGrPolygon;
+	tetraBase->Texture(&m_woodtex);
+	tetraBase->AddTexVertex3d(t0[0], t0[1], t0[2], 0.0, 0.0); 
+	tetraBase->AddTexVertex3d(t1[0], t1[1], t1[2], 1.0, 0.0); 
+	tetraBase->AddTexVertex3d(t2[0], t2[1], t2[2], 0.5, 1.0); 
+	tetraBase->ComputeNormal(); 
+	scene->Child(tetraBase); 
+	// Face 1
+	CGrPtr<CGrPolygon> tetraFace1 = new CGrPolygon;
+	tetraFace1->Texture(&m_woodtex);
+	tetraFace1->AddTexVertex3d(t1[0], t1[1], t1[2], 0.0, 0.0); 
+	tetraFace1->AddTexVertex3d(t0[0], t0[1], t0[2], 1.0, 0.0); 
+	tetraFace1->AddTexVertex3d(t3[0], t3[1], t3[2], 0.5, 1.0);
+	tetraFace1->ComputeNormal();
+	scene->Child(tetraFace1);
+	// Face 2 
+	CGrPtr<CGrPolygon> tetraFace2 = new CGrPolygon;
+	tetraFace2->Texture(&m_woodtex);
+	tetraFace2->AddTexVertex3d(t2[0], t2[1], t2[2], 0.0, 0.0); 
+	tetraFace2->AddTexVertex3d(t1[0], t1[1], t1[2], 1.0, 0.0); 
+	tetraFace2->AddTexVertex3d(t3[0], t3[1], t3[2], 0.5, 1.0);
+	tetraFace2->ComputeNormal();
+	scene->Child(tetraFace2);
+	// Face 3 
+	CGrPtr<CGrPolygon> tetraFace3 = new CGrPolygon;
+	tetraFace3->Texture(&m_woodtex);
+	tetraFace3->AddTexVertex3d(t0[0], t0[1], t0[2], 0.0, 0.0);
+	tetraFace3->AddTexVertex3d(t2[0], t2[1], t2[2], 1.0, 0.0);
+	tetraFace3->AddTexVertex3d(t3[0], t3[1], t3[2], 0.5, 1.0);
+	tetraFace3->ComputeNormal();
+	scene->Child(tetraFace3);*/
 
 	//
 	// Add a floor
