@@ -171,16 +171,16 @@ CChildView::CChildView()
 	m_worldtex.LoadFile(L"textures/worldmap.bmp");
 	m_woodtex.LoadFile(L"textures/plank01.bmp");
 
-	//// A red box
-	//CGrPtr<CGrMaterial> redpaint = new CGrMaterial;
-	//redpaint->AmbientAndDiffuse(0.8f, 0.0f, 0.0f);
-	////redpaint->AmbientDiffuseSpecularShininess(ambient, redDiffuse, specular, shininess);  // BP model
-	//scene->Child(redpaint);
+	// A red box
+	/*CGrPtr<CGrMaterial> redpaint = new CGrMaterial;
+	redpaint->AmbientAndDiffuse(0.8f, 0.0f, 0.0f);
+	//redpaint->AmbientDiffuseSpecularShininess(ambient, redDiffuse, specular, shininess);  // BP model
+	scene->Child(redpaint);
 
-	//CGrPtr<CGrComposite> redbox = new CGrComposite;
-	//redpaint->Child(redbox);
-	////redbox->Box(1, 1, 1, 5, 5, 5, &m_woodtex);
-	//redbox->Box(1, 1, 1, 5, 5, 5);
+	CGrPtr<CGrComposite> redbox = new CGrComposite;
+	redpaint->Child(redbox);
+	//redbox->Box(1, 1, 1, 5, 5, 5, &m_woodtex);
+	redbox->Box(1, 1, 1, 5, 5, 5);*/
 
 	// A white box
 	CGrPtr<CGrMaterial> whitepaint = new CGrMaterial;

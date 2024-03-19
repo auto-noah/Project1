@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "CMyRaytraceRenderer.h"
+#include <algorithm>
 
 void CMyRaytraceRenderer::SetWindow(CWnd* p_window)
 {
@@ -97,108 +98,98 @@ void CMyRaytraceRenderer::RendererEndPolygon()
     m_intersection.PolygonEnd();
 }
 
-void CMyRaytraceRenderer::RayColor(const CRay& p_ray, CGrPoint& p_color, int p_recurse, const CRayIntersection::Object* p_ignore)
+void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse, const CRayIntersection::Object* ignore)
 {
+    double t; // Will be distance to intersection
+    CGrPoint intersect; // Will by x,y,z location of intersection
+    const CRayIntersection::Object* nearest; // Pointer to intersecting object
 
+    if (m_intersection.Intersect(ray, 1e20, ignore, nearest, t, intersect))
+    {
+        // We hit something...
+        CGrPoint N; // Normal at the intersection
+        CGrMaterial* material; // Material at the intersection
+        CGrTexture* texture; // Texture at the intersection (if any)
+        CGrPoint texcoord; // Texture coordinates at the intersection (if any)
+        m_intersection.IntersectInfo(ray, nearest, t, N, material, texture, texcoord);
+
+        // The color computation starts here
+        if (material != NULL) {
+            color = material->Ambient(); // Start with the ambient light
+
+            for (int i = 0; i < LightCnt(); ++i)
+            {
+                const Light& light = GetLight(i);
+                CGrPoint lightDir = light.m_pos - intersect;
+
+                double length = sqrt(lightDir.X() * lightDir.X() + lightDir.Y() * lightDir.Y() + lightDir.Z() * lightDir.Z());
+                if (length != 0) // Avoid division by zero 
+                {
+                    lightDir = lightDir / length;
+                }
+
+                CRay shadowRay(intersect + N * 0.001, lightDir);
+
+                const CRayIntersection::Object* shadowNearest;
+                if (!m_intersection.Intersect(shadowRay, length, nearest, shadowNearest, t, intersect))
+                {
+                    // If no intersection, the point is not in shadow for this light
+                    color += CalculateLighting(N, material, light, lightDir);
+                }
+            }
+        }
+    }
+    else
+    {
+        // No intersection: return black as background color
+        color = CGrPoint(0, 0, 0); 
+    }
 }
 
 bool CMyRaytraceRenderer::RendererEnd()
 {
-	m_intersection.LoadingComplete();
+    m_intersection.LoadingComplete();
 
-	double ymin = -tan(ProjectionAngle() / 2 * GR_DTOR);
-	double yhit = -ymin * 2;
+    double ymin = -tan(ProjectionAngle() / 2 * GR_DTOR);
+    double yhit = -ymin * 2;
 
-	double xmin = ymin * ProjectionAspect();
-	double xwid = -xmin * 2;
+    double xmin = ymin * ProjectionAspect();
+    double xwid = -xmin * 2;
 
-	for (int r = 0; r < m_rayimageheight; r++)
-	{
-		for (int c = 0; c < m_rayimagewidth; c++)
-		{
-			double colorTotal[3] = { 0, 0, 0 }; // This line seems pointless
+    for (int r = 0; r < m_rayimageheight; r++)
+    {
+        for (int c = 0; c < m_rayimagewidth; c++)
+        {
+            double x = xmin + (c + 0.5) / m_rayimagewidth * xwid;
+            double y = ymin + (r + 0.5) / m_rayimageheight * yhit;
 
-			double x = xmin + (c + 0.5) / m_rayimagewidth * xwid;
-			double y = ymin + (r + 0.5) / m_rayimageheight * yhit;
+            // Construct a Ray
+            CRay ray(CGrPoint(0, 0, 0), Normalize3(CGrPoint(x, y, -1)));
+            CGrPoint color;
 
-			// Construct a Ray
-			CRay ray(CGrPoint(0, 0, 0), Normalize3(CGrPoint(x, y, -1, 0)));
+            // Compute the color for the ray
+            RayColor(ray, color, 0, NULL);
 
-			double t;                                   // Will be distance to intersection
-			CGrPoint intersect;                         // Will by x,y,z location of intersection
-			const CRayIntersection::Object* nearest;    // Pointer to intersecting object
-			if (m_intersection.Intersect(ray, 1e20, NULL, nearest, t, intersect))
-			{
-				// We hit something...
-				// Determine information about the intersection
-				CGrPoint N;
-				CGrMaterial* material;
-				CGrTexture* texture;
-				CGrPoint texcoord;
-				m_intersection.IntersectInfo(ray, nearest, t, N, material, texture, texcoord);
+            // Convert the color to bytes and write to the image buffer
+            m_rayimage[r][c * 3] = static_cast<BYTE>(color.X() * 255);
+            m_rayimage[r][c * 3 + 1] = static_cast<BYTE>(color.Y() * 255);
+            m_rayimage[r][c * 3 + 2] = static_cast<BYTE>(color.Z() * 255);
+        }
 
+        // Refresh the window every 50 rows to show progress
+        if ((r % 50) == 0)
+        {
+            m_window->Invalidate();
+            MSG msg;
+            while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+    }
 
-				if (material != NULL)
-				{
-					//
-					// Compute Ray Color
-					//
-
-					// Note that material might be NULL
-					CGrPoint color = material->Ambient(); // Start with the ambient light
-
-					// Iterate over all lights in the renderer
-					for (int i = 0; i < LightCnt(); ++i) 
-					{
-						// Get current light and its direction
-						const Light& light = GetLight(i); 
-						CGrPoint lightDir = light.m_pos - intersect; 
-
-						// Calculate the length of the light direction vector
-						double lightDistance = sqrt(lightDir.X() * lightDir.X() + lightDir.Y() * lightDir.Y() + lightDir.Z() * lightDir.Z()); 
-
-						// Normalize the light direction vector
-						if (lightDistance != 0) // Avoid division by zero 
-						{
-							lightDir = CGrPoint(lightDir.X() / lightDistance, lightDir.Y() / lightDistance, lightDir.Z() / lightDistance); 
-						}
-
-						// Offset the origin to avoid self-intersection
-						CRay shadowRay(intersect + N * 0.001, lightDir); 
-
-						// Check if the shadow ray hits any object before reaching the light (ShadowFeeler)
-						const CRayIntersection::Object* shadowNearest; 
-						if (!m_intersection.Intersect(shadowRay, lightDistance, nearest, shadowNearest, t, intersect)) 
-						{
-							// If no intersection, the point is not in shadow for this light
-							color += CalculateLighting(N, material, light, lightDir);
-						}
-					}
-				
-					// Convert color to bytes and write to image buffer
-					m_rayimage[r][c * 3] = BYTE(material->Diffuse(0) * color[0] * 255); // todo the math here might be janky and it might be going over 255
-					m_rayimage[r][c * 3 + 1] = BYTE(material->Diffuse(1) * color[1] * 255); // I also don't think the lighting application is calculated correctly
-					m_rayimage[r][c * 3 + 2] = BYTE(material->Diffuse(2) * color[2] * 255);
-				}
-			}
-			else
-			{
-				// We hit nothing... set to background color
-				m_rayimage[r][c * 3] = 0;
-				m_rayimage[r][c * 3 + 1] = 0;
-				m_rayimage[r][c * 3 + 2] = 0;
-			}
-		}
-		if ((r % 50) == 0)
-		{
-			m_window->Invalidate();
-			MSG msg;
-			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-				DispatchMessage(&msg);
-		}
-	}
-
-	return true;
+    return true;
 }
 
 double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPoint& normal, float lightInt, float Ka, float Kd, float Ks, float shininess)
