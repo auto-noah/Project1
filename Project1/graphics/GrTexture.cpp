@@ -35,6 +35,25 @@ using namespace std;
 #define DIB_HEADER_MARKER   ((WORD) ('M' << 8) | 'B')
 const int PADSIZE = 4;
 
+// Get the texture's color where the ray hits
+CGrPoint CGrTexture::Sample(double u, double v) const
+{
+    // Map texture coordinates to image space
+    int x = static_cast<int>(u * (m_width - 1));
+    int y = static_cast<int>(v * (m_height - 1));
+
+    // Access the color in the texture image
+    // Assuming each row is tightly packed with pixels and each pixel has 3 components (RGB)
+    const BYTE* row = m_image[y];
+    int index = x * 3; // Multiply by 3 for RGB
+    double r = row[index] / 255.0;
+    double g = row[index + 1] / 255.0;
+    double b = row[index + 2] / 255.0;
+
+    // Return the color as a CGrPoint
+    return CGrPoint(r, g, b);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

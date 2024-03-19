@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "CMyRaytraceRenderer.h"
+#include "graphics/GrTexture.h"
 #include <algorithm>
 
 void CMyRaytraceRenderer::SetWindow(CWnd* p_window)
@@ -114,28 +115,42 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
         m_intersection.IntersectInfo(ray, nearest, t, N, material, texture, texcoord);
 
         // The color computation starts here
-        if (material != NULL) {
-            color = material->Ambient(); // Start with the ambient light
+        /*if (texture != NULL) 
+        {
+            // Use texture coordinates to sample the texture color
+            CGrPoint textureColor = texture->Sample(texcoord.X(), texcoord.Y());
+            color = textureColor; // Start with the texture color
+        }
+        else */if (material != NULL)
+        {
+            // Use the ambient color of the material if there's no texture
+            color = material->Ambient();
+        }
+        else
+        {
+            // Default to white if there's neither texture nor material
+            color = CGrPoint(1.0, 1.0, 1.0);
+        }
 
-            for (int i = 0; i < LightCnt(); ++i)
+        // Now apply lighting to the texture or material color
+        for (int i = 0; i < LightCnt(); ++i)
+        {
+            const Light& light = GetLight(i);
+            CGrPoint lightDir = light.m_pos - intersect;
+
+            double length = sqrt(lightDir.X() * lightDir.X() + lightDir.Y() * lightDir.Y() + lightDir.Z() * lightDir.Z());
+            if (length != 0) // Avoid division by zero 
             {
-                const Light& light = GetLight(i);
-                CGrPoint lightDir = light.m_pos - intersect;
+                lightDir = lightDir / length;
+            }
 
-                double length = sqrt(lightDir.X() * lightDir.X() + lightDir.Y() * lightDir.Y() + lightDir.Z() * lightDir.Z());
-                if (length != 0) // Avoid division by zero 
-                {
-                    lightDir = lightDir / length;
-                }
+            CRay shadowRay(intersect + N * 0.001, lightDir);
 
-                CRay shadowRay(intersect + N * 0.001, lightDir);
-
-                const CRayIntersection::Object* shadowNearest;
-                if (!m_intersection.Intersect(shadowRay, length, nearest, shadowNearest, t, intersect))
-                {
-                    // If no intersection, the point is not in shadow for this light
-                    color += CalculateLighting(N, material, light, lightDir);
-                }
+            const CRayIntersection::Object* shadowNearest;
+            if (!m_intersection.Intersect(shadowRay, length, nearest, shadowNearest, t, intersect))
+            {
+                // If no intersection, the point is not in shadow for this light
+                color += CalculateLighting(N, material, light, lightDir);
             }
         }
     }
@@ -215,16 +230,49 @@ double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPo
 
 CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir)
 {
-	// Calculate the diffuse and specular contribution from the light
-	// ... (implement lighting calculation here)
-
-	// return lightingColor;
-
-	// Get diffuse and specular components
+	/*// Get diffuse and specular components
 	// The values for ka, kd, and ks are most likely wrong
+    if (material != NULL) {
+
+    }
 	double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1.0, 0.3, 0.3, 0.7, material->Shininess());
 
 	// Apply lighting
 	//gl_FragColor = vec4(shading[0] * vec3(1., 1., 1.) + shading[1] * vec3(1., 1., 1.), 1.0) * texture2D(uSampler, fUV) + vec4(0.2, 0.2, 0.2, 0.);
-	return (CGrPoint(1., 1., 1., 1.) * diffuseAndSpecular[0]) + (CGrPoint(1., 1., 1.) * diffuseAndSpecular[1]);
+	return (CGrPoint(1., 1., 1., 1.) * diffuseAndSpecular[0]) + (CGrPoint(1., 1., 1.) * diffuseAndSpecular[1]);*/
+
+    // Default values for lighting components
+    const float defaultKa = 0.3;
+    const float defaultKd = 0.7;
+    const float defaultKs = 0.5;
+    const float defaultShininess = 10.0; // This is a guess, adjust as needed
+
+    float Ka, Kd, Ks, shininess;
+
+    // Check if the material is not NULL, if it is, use the default values
+    if (material != NULL) {
+        // Check each aspect of material lighting for specified values
+        Ka = material->Ambient() ? *material->Ambient() : defaultKa;
+        Kd = material->Diffuse() ? *material->Diffuse() : defaultKd;
+        Ks = material->Specular() ? *material->Specular() : defaultKs;
+        shininess = material->Shininess() ? material->Shininess() : defaultShininess;
+    }
+    else {
+        Ka = defaultKa;
+        Kd = defaultKd;
+        Ks = defaultKs;
+        shininess = defaultShininess;
+    }
+
+    // Call blinnPhongDir with either the material's properties or the default values
+    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1.0, Ka, Kd, Ks, shininess);
+
+    // Create the color based on the diffuse and specular components
+    CGrPoint color(diffuseAndSpecular[0], diffuseAndSpecular[0], diffuseAndSpecular[0]);
+    CGrPoint lightingColor = color * diffuseAndSpecular[0] + CGrPoint(1., 1., 1.) * diffuseAndSpecular[1];
+
+    // Clean up the allocated array to prevent memory leaks
+    delete[] diffuseAndSpecular;
+
+    return lightingColor;
 }
