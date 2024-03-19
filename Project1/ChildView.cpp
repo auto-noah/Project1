@@ -158,14 +158,6 @@ CChildView::CChildView()
 	//
 	// Make boxes
 	// 
-
-	// Init Blinn-Phong attributes
-	float ambient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
-	float whiteDiffuse[] = { .8f, .8f, .8f, 1.0f };
-	float redDiffuse[] = { 0.8f, 0.0f, 0.0f, 1.0f };
-	float orangeDiffuse[] = { 0.8f, 0.5f, 0.2f, 1.0f };
-	float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // White specular highlights
-	float shininess = 5.0f; // Adjust based on how shiny the surface should be
 	
 	// Load textures for boxes
 	m_worldtex.LoadFile(L"textures/worldmap.bmp");
@@ -174,7 +166,6 @@ CChildView::CChildView()
 	// A red box
 	CGrPtr<CGrMaterial> redpaint = new CGrMaterial;
 	redpaint->AmbientAndDiffuse(0.8f, 0.0f, 0.0f);
-	//redpaint->AmbientDiffuseSpecularShininess(ambient, redDiffuse, specular, shininess);  // BP model
 	scene->Child(redpaint);
 
 	CGrPtr<CGrComposite> redbox = new CGrComposite;
@@ -185,7 +176,6 @@ CChildView::CChildView()
 	// A white box
 	CGrPtr<CGrMaterial> whitepaint = new CGrMaterial;
 	whitepaint->AmbientAndDiffuse(0.8f, 0.8f, 0.8f);
-	//whitepaint->AmbientDiffuseSpecularShininess(ambient, orangeDiffuse, specular, shininess); // BP model
 	scene->Child(whitepaint);
 
 	CGrPtr<CGrComposite> whitebox = new CGrComposite;
