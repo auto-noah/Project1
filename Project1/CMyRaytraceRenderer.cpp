@@ -2,6 +2,7 @@
 #include "CMyRaytraceRenderer.h"
 #include "graphics/GrTexture.h"
 #include <algorithm>
+#include <cmath>
 
 void CMyRaytraceRenderer::SetWindow(CWnd* p_window)
 {
@@ -115,13 +116,13 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
         m_intersection.IntersectInfo(ray, nearest, t, N, material, texture, texcoord);
 
         // The color computation starts here
-        /*if (texture != NULL) 
+        if (texture != NULL)
         {
             // Use texture coordinates to sample the texture color
             CGrPoint textureColor = texture->Sample(texcoord.X(), texcoord.Y());
             color = textureColor; // Start with the texture color
         }
-        else */if (material != NULL)
+        else if (material != NULL)
         {
             // Use the ambient color of the material if there's no texture
             color = material->Ambient();
@@ -145,7 +146,6 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
             }
 
             CRay shadowRay(intersect + N * 0.001, lightDir);
-
             const CRayIntersection::Object* shadowNearest;
             if (!m_intersection.Intersect(shadowRay, length, nearest, shadowNearest, t, intersect))
             {
@@ -186,9 +186,9 @@ bool CMyRaytraceRenderer::RendererEnd()
             RayColor(ray, color, 0, NULL);
 
             // Convert the color to bytes and write to the image buffer
-            m_rayimage[r][c * 3] = static_cast<BYTE>(color.X() * 255);
-            m_rayimage[r][c * 3 + 1] = static_cast<BYTE>(color.Y() * 255);
-            m_rayimage[r][c * 3 + 2] = static_cast<BYTE>(color.Z() * 255);
+            m_rayimage[r][c * 3] = static_cast<BYTE>((((255) < (color.X() * 255)) ? (255) : (color.X() * 255 * 0.1)));     // TODO: Remove "* 0.1" from the end of all three of 
+            m_rayimage[r][c * 3 + 1] = static_cast<BYTE>((((255) < (color.Y() * 255)) ? (255) : (color.Y() * 255 * 0.1))); // these and figure out why everything is washed out
+            m_rayimage[r][c * 3 + 2] = static_cast<BYTE>((((255) < (color.Z() * 255)) ? (255) : (color.Z() * 255 * 0.1))); // (most likely issue with blinn phong color calc)
         }
 
         // Refresh the window every 50 rows to show progress
@@ -245,24 +245,13 @@ CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* 
     const float defaultKa = 0.3;
     const float defaultKd = 0.7;
     const float defaultKs = 0.5;
-    const float defaultShininess = 10.0; // This is a guess, adjust as needed
-
-    float Ka, Kd, Ks, shininess;
+    const float defaultShininess = 50.0; // This is a guess, adjust as needed
 
     // Check if the material is not NULL, if it is, use the default values
-    if (material != NULL) {
-        // Check each aspect of material lighting for specified values
-        Ka = material->Ambient() ? *material->Ambient() : defaultKa;
-        Kd = material->Diffuse() ? *material->Diffuse() : defaultKd;
-        Ks = material->Specular() ? *material->Specular() : defaultKs;
-        shininess = material->Shininess() ? material->Shininess() : defaultShininess;
-    }
-    else {
-        Ka = defaultKa;
-        Kd = defaultKd;
-        Ks = defaultKs;
-        shininess = defaultShininess;
-    }
+    float Ka = (material != nullptr) ? *material->Ambient() : defaultKa;
+    float Kd = (material != nullptr) ? *material->Diffuse() : defaultKd;
+    float Ks = (material != nullptr) ? *material->Specular() : defaultKs;
+    float shininess = (material != nullptr) ? material->Shininess() : defaultShininess;
 
     // Call blinnPhongDir with either the material's properties or the default values
     double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1.0, Ka, Kd, Ks, shininess);

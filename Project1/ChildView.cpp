@@ -172,7 +172,7 @@ CChildView::CChildView()
 	m_woodtex.LoadFile(L"textures/plank01.bmp");
 
 	// A red box
-	/*CGrPtr<CGrMaterial> redpaint = new CGrMaterial;
+	CGrPtr<CGrMaterial> redpaint = new CGrMaterial;
 	redpaint->AmbientAndDiffuse(0.8f, 0.0f, 0.0f);
 	//redpaint->AmbientDiffuseSpecularShininess(ambient, redDiffuse, specular, shininess);  // BP model
 	scene->Child(redpaint);
@@ -180,7 +180,7 @@ CChildView::CChildView()
 	CGrPtr<CGrComposite> redbox = new CGrComposite;
 	redpaint->Child(redbox);
 	//redbox->Box(1, 1, 1, 5, 5, 5, &m_woodtex);
-	redbox->Box(1, 1, 1, 5, 5, 5);*/
+	redbox->Box(1, 1, 1, 5, 5, 5);
 
 	// A white box
 	CGrPtr<CGrMaterial> whitepaint = new CGrMaterial;
@@ -190,7 +190,7 @@ CChildView::CChildView()
 
 	CGrPtr<CGrComposite> whitebox = new CGrComposite;
 	whitepaint->Child(whitebox);
-	whitebox->Box(-10, -10, -10, 5, 5, 5, &m_worldtex);
+	whitebox->Box(-10, -9, -10, 5, 5, 5, &m_worldtex);
 	//whitebox->Box(-10, -10, -10, 5, 5, 5);
 }
 
@@ -343,15 +343,15 @@ void CChildView::ConfigureRenderer(CGrRenderer* p_renderer)
 	// Set the light locations and colors
 	//
 
-	float dimd = 0.5f;
-	GLfloat dim[] = { dimd, dimd, dimd, 1.0f };
-	GLfloat brightwhite[] = { 1.f, 1.f, 1.f, 1.0f };
+	float dimAmbient = 0.3f; 
+	GLfloat ambientColor[] = { dimAmbient, dimAmbient, dimAmbient, 1.0f }; 
+	GLfloat lightDiffuse[] = { 0.6f, 0.6f, 0.6f, 1.0f };
+	GLfloat lightSpecular[] = { 0.7f, 0.7f, 0.7f, 1.0f };
 
-	// Add two lights to the renderer
-	p_renderer->AddLight(CGrPoint(1, 0.5, 1.2, 0), // Light 1
-		dim, brightwhite, brightwhite);
-	p_renderer->AddLight(CGrPoint(-5, 2, 5, 0),    // Light 2
-		dim, brightwhite, brightwhite);
+	p_renderer->AddLight(CGrPoint(20, 5, 5, 0),  // Light 1
+		ambientColor, lightDiffuse, lightSpecular);
+	//p_renderer->AddLight(CGrPoint(-20, 5, 5, 0), // Light 2
+	//	ambientColor, lightDiffuse, lightSpecular);
 }
 
 
