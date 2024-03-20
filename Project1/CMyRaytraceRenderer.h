@@ -36,7 +36,7 @@ public:
 
     CGrPoint CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir, const CGrPoint& intersectionPoint, CGrPoint color);
 
-    CGrPoint CalculateIndirectSpecular(const CRay& ray, const CGrPoint& N, const CGrPoint& intersectionPoint, int recurse);
+   CGrPoint CalculateIndirectSpecular(const CRay& ray, const CGrPoint& N, const CGrPoint& intersectionPoint, int recurse);
 
     double* blinnPhongDir(const CGrPoint& lightDir, const CGrPoint& normal, float lightInt, float Ka, float Kd, float Ks, float shininess, const CGrPoint& intersectionPoint);
 };

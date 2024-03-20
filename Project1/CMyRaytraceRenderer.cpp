@@ -127,7 +127,7 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
         //
 
         // If the material is reflective, calculate the reflection ray
-        if (material != NULL && material->Shininess() >= 90 && recurse <= 1)
+        if (material != NULL && material->Shininess() >= 90 && recurse <= 2)
         {
             // Compute reflection direction
             CGrPoint reflectionDir = Reflect(ray.Direction(), N);
@@ -140,9 +140,8 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
             // Set the color to the reflection color
             color = reflectionColor;
         }
-        else
+        else // Handle non-reflective materials 
         {
-            // Handle non-reflective materials 
             if (texture != NULL)
             {
                 // Use texture coordinates to sample the texture color
@@ -152,7 +151,7 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
             else if (material != NULL)
             {
                 // Use the ambient color of the material if there's no texture
-                color = material->Ambient();
+                color = material->Ambient(); 
             }
             else
             {
@@ -199,8 +198,6 @@ bool CMyRaytraceRenderer::RendererEnd()
     double xmin = ymin * ProjectionAspect();
     double xwid = -xmin * 2;
 
-    int maxRecurse = 3;
-
     for (int r = 0; r < m_rayimageheight; r++)
     {
         for (int c = 0; c < m_rayimagewidth; c++)
@@ -213,12 +210,10 @@ bool CMyRaytraceRenderer::RendererEnd()
             CGrPoint color;
 
             // Compute the color for the ray
-            RayColor(ray, color, maxRecurse, NULL);
+            RayColor(ray, color, 0, NULL); // LEAVE RECURSE VALUE AT ZERO FOR REFLECTIONS
 
             // Convert the color to bytes and write to the image buffer
-
-            float attentuator = 0.5; // <-- jank fix to the brightness issue. Feel free to adjust
-
+            float attentuator = 0.5; 
             m_rayimage[r][c * 3] = static_cast<BYTE>(min(max(0, color.X() * 255 * attentuator), 255));
             m_rayimage[r][c * 3 + 1] = static_cast<BYTE>(min(max(0, color.Y() * 255 * attentuator), 255));
             m_rayimage[r][c * 3 + 2] = static_cast<BYTE>(min(max(0, color.Z() * 255 * attentuator), 255));
@@ -283,7 +278,6 @@ CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* 
         colorDiffuse = CGrPoint(material->Diffuse(0), material->Diffuse(1), material->Diffuse(2));
         colorSpecular = CGrPoint(material->Specular(0), material->Specular(1), material->Specular(2));
     }
-
     CGrPoint lightingColor = colorDiffuse * diffuseAndSpecular[0] + colorSpecular * diffuseAndSpecular[1];
 
     // Clean up the allocated array to prevent memory leaks
