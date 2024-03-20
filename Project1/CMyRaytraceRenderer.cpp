@@ -151,6 +151,8 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
             if (!m_intersection.Intersect(shadowRay, length, nearest, shadowNearest, t, intersect))
             {
                 // If no intersection, the point is not in shadow for this light
+                
+                // this should add both diffuse and specular
                 color += CalculateLighting(N, material, light, lightDir, intersect, color);
             }
         }
@@ -187,9 +189,12 @@ bool CMyRaytraceRenderer::RendererEnd()
             RayColor(ray, color, 0, NULL);
 
             // Convert the color to bytes and write to the image buffer
-            m_rayimage[r][c * 3] = static_cast<BYTE>((((255) < (color.X() * 255)) ? (255) : (color.X() * 255 *0.1)));     // TODO: Remove "* 0.1" from the end of all three of 
-            m_rayimage[r][c * 3 + 1] = static_cast<BYTE>((((255) < (color.Y() * 255)) ? (255) : (color.Y() * 255 * 0.1))); // these and figure out why everything is washed out
-            m_rayimage[r][c * 3 + 2] = static_cast<BYTE>((((255) < (color.Z() * 255)) ? (255) : (color.Z() * 255 * 0.1))); // (most likely issue with blinn phong color calc)
+
+            float attentuator = 0.5; // <-- jank fix to the brightness issue. Feel free to adjust
+
+            m_rayimage[r][c * 3] = static_cast<BYTE>(min(color.X() * 255 * attentuator, 255));
+            m_rayimage[r][c * 3 + 1] = static_cast<BYTE>(min(color.Y() * 255 * attentuator, 255));
+            m_rayimage[r][c * 3 + 2] = static_cast<BYTE>(min(color.Z() * 255 * attentuator, 255));
         }
 
         // Refresh the window every 50 rows to show progress
@@ -213,16 +218,16 @@ double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPo
 	// Calculate diffuse and specular components
 
     // View direction
-    CGrPoint viewDir = Normalize3(Eye() - intersectionPoint);
+    CGrPoint viewDir = Normalize3(intersectionPoint - Eye()); // initial from terminal
 
     // Halfway direction
     CGrPoint halfwayDir = Normalize3(lightDir + viewDir);
 
     // Diffuse component
-    float diffuse = Ka + Kd * lightInt * max(Dot3(lightDir, normal), 0.0);
+    float diffuse = Kd * lightInt * max(Dot3(lightDir, normal), 0.0);
 
     // Specular component
-    float spec = Ks * pow(max(Dot3(halfwayDir, normal), 0.0), shininess);
+    float spec = Ks * lightInt * pow(max(Dot3(halfwayDir, normal), 0.0), shininess);
 
     return new double[2] { diffuse, spec };
 }
@@ -233,7 +238,7 @@ CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* 
     const float defaultKa = 0.3;
     const float defaultKd = 0.7;
     const float defaultKs = 0.3;
-    const float defaultShininess = 5; // This is a guess, adjust as needed
+    const float defaultShininess = 50; // This is a guess, adjust as needed
 
     // Check if the material is not NULL, if it is, use the default values
     float Ka = (material != nullptr) ? *material->Ambient() : defaultKa;
@@ -242,18 +247,18 @@ CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* 
     float shininess = (material != nullptr) ? material->Shininess() : defaultShininess;
 
     // Call blinnPhongDir with either the material's properties or the default values
-    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 0.25, Ka, Kd, Ks, shininess, intersectionPoint); // Light Intesity needs to be figured out (1.0 value whites out the scene)
-
+    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1, Ka, Kd, Ks, shininess, intersectionPoint); // Light Intesity needs to be figured out (1.0 value whites out the scene)
 
     // Create the lighting color based on diffuse and specular components
-    //CGrPoint lightingColor = color * diffuseAndSpecular[0] + color * diffuseAndSpecular[1];
+    CGrPoint colorDiffuse = color;
+    CGrPoint colorSpecular = color;
+    if (material != NULL){
+        colorDiffuse = CGrPoint(material->Diffuse(0), material->Diffuse(1), material->Diffuse(2));
+        colorSpecular = CGrPoint(material->Specular(0), material->Specular(1), material->Specular(2));
+    }
 
-    CGrPoint color2 = color;
-    if(material != NULL)
-        color2 = CGrPoint(material->Diffuse(0), material->Diffuse(1), material->Diffuse(2));
-
-    CGrPoint lightingColor = color2 * diffuseAndSpecular[0] + color2 * diffuseAndSpecular[1];
-
+    // this right here calculates the diffuse and specular elements but I don't think "color2" is correct
+    CGrPoint lightingColor = colorDiffuse * diffuseAndSpecular[0] + colorSpecular * diffuseAndSpecular[1];
 
     // Clean up the allocated array to prevent memory leaks
     delete[] diffuseAndSpecular;
