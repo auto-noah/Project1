@@ -199,6 +199,8 @@ bool CMyRaytraceRenderer::RendererEnd()
     double xmin = ymin * ProjectionAspect();
     double xwid = -xmin * 2;
 
+    int maxRecurse = 3;
+
     for (int r = 0; r < m_rayimageheight; r++)
     {
         for (int c = 0; c < m_rayimagewidth; c++)
@@ -211,15 +213,15 @@ bool CMyRaytraceRenderer::RendererEnd()
             CGrPoint color;
 
             // Compute the color for the ray
-            RayColor(ray, color, 0, NULL);
+            RayColor(ray, color, maxRecurse, NULL);
 
             // Convert the color to bytes and write to the image buffer
 
             float attentuator = 0.5; // <-- jank fix to the brightness issue. Feel free to adjust
 
-            m_rayimage[r][c * 3] = static_cast<BYTE>(min(color.X() * 255 * attentuator, 255));
-            m_rayimage[r][c * 3 + 1] = static_cast<BYTE>(min(color.Y() * 255 * attentuator, 255));
-            m_rayimage[r][c * 3 + 2] = static_cast<BYTE>(min(color.Z() * 255 * attentuator, 255));
+            m_rayimage[r][c * 3] = static_cast<BYTE>(min(max(0, color.X() * 255 * attentuator), 255));
+            m_rayimage[r][c * 3 + 1] = static_cast<BYTE>(min(max(0, color.Y() * 255 * attentuator), 255));
+            m_rayimage[r][c * 3 + 2] = static_cast<BYTE>(min(max(0, color.Z() * 255 * attentuator), 255));
         }
 
         // Refresh the window every 50 rows to show progress
@@ -272,7 +274,7 @@ CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* 
     float shininess = (material != nullptr) ? material->Shininess() : defaultShininess;
 
     // Call blinnPhongDir with either the material's properties or the default values
-    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1, Ka, Kd, Ks, shininess, intersectionPoint); // Light Intesity needs to be figured out (1.0 value whites out the scene)
+    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1, Ka, Kd, Ks, shininess, intersectionPoint); 
 
     // Create the lighting color based on diffuse and specular components
     CGrPoint colorDiffuse = color;
@@ -282,11 +284,34 @@ CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* 
         colorSpecular = CGrPoint(material->Specular(0), material->Specular(1), material->Specular(2));
     }
 
-    // this right here calculates the diffuse and specular elements but I don't think "color2" is correct
     CGrPoint lightingColor = colorDiffuse * diffuseAndSpecular[0] + colorSpecular * diffuseAndSpecular[1];
 
     // Clean up the allocated array to prevent memory leaks
     delete[] diffuseAndSpecular;
 
     return lightingColor;
+}
+
+
+CGrPoint CMyRaytraceRenderer::CalculateIndirectSpecular(const CRay& ray, const CGrPoint& N, const CGrPoint& intersectionPoint, int recurse)
+{
+    CGrPoint specularother(0, 0, 0);
+
+    if (recurse > 1)
+    {
+        // Compute reflected ray direction
+        CGrPoint R = N * (2 * Dot3(N, -ray.Direction())) - (-ray.Direction());
+
+        // Construct reflected ray
+        CRay reflectedRay(intersectionPoint + N * 0.001, R);
+
+        // Compute color recursively for reflected ray
+        CGrPoint reflectedColor;
+        RayColor(reflectedRay, reflectedColor, recurse - 1, nullptr);
+
+        // Calculate specular contribution from other surfaces
+        specularother = reflectedColor;
+    }
+
+    return specularother;
 }
