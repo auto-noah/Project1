@@ -284,8 +284,8 @@ void CChildView::ConfigureRenderer(CGrRenderer* p_renderer)
 
 	p_renderer->AddLight(CGrPoint(20, 5, 5, 0),  // Light 1
 		ambientColor, lightDiffuse, lightSpecular);
-	//p_renderer->AddLight(CGrPoint(-20, 5, 5, 0), // Light 2
-	//	ambientColor, lightDiffuse, lightSpecular);
+	p_renderer->AddLight(CGrPoint(-20, 5, 5, 0), // Light 2
+		ambientColor, lightDiffuse, lightSpecular);
 }
 
 
