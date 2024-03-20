@@ -100,6 +100,13 @@ void CMyRaytraceRenderer::RendererEndPolygon()
     m_intersection.PolygonEnd();
 }
 
+CGrPoint CMyRaytraceRenderer::Reflect(const CGrPoint& incident, const CGrPoint& normal) const
+{
+    double dot = Dot3(incident, normal);
+    CGrPoint reflected = incident - normal * (2.0 * dot);
+    return reflected;
+}
+
 void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse, const CRayIntersection::Object* ignore)
 {
     double t; // Will be distance to intersection
@@ -115,26 +122,46 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
         CGrPoint texcoord; // Texture coordinates at the intersection (if any)
         m_intersection.IntersectInfo(ray, nearest, t, N, material, texture, texcoord);
 
-        // The color computation starts here
-        if (texture != NULL)
+        //
+        // Color computation
+        //
+
+        // If the material is reflective, calculate the reflection ray
+        if (material != NULL && material->Shininess() >= 90 && recurse <= 1)
         {
-            // Use texture coordinates to sample the texture color
-            CGrPoint textureColor = texture->Sample(texcoord.X(), texcoord.Y());
-            color = textureColor; // Start with the texture color
-        }
-        else if (material != NULL)
-        {
-            // Use the ambient color of the material if there's no texture
-            color = material->Ambient();
+            // Compute reflection direction
+            CGrPoint reflectionDir = Reflect(ray.Direction(), N);
+            CRay reflectionRay(intersect + N * 0.001, reflectionDir); // Offset to avoid self-intersection
+
+            // Recursively trace the reflection ray
+            CGrPoint reflectionColor;
+            RayColor(reflectionRay, reflectionColor, recurse + 1, nearest);
+
+            // Set the color to the reflection color
+            color = reflectionColor;
         }
         else
         {
-            // Default to white if there's neither texture nor material
-            color = CGrPoint(1.0, 1.0, 1.0);
+            // Handle non-reflective materials 
+            if (texture != NULL)
+            {
+                // Use texture coordinates to sample the texture color
+                CGrPoint textureColor = texture->Sample(texcoord.X(), texcoord.Y());
+                color = textureColor; // Start with the texture color
+            }
+            else if (material != NULL)
+            {
+                // Use the ambient color of the material if there's no texture
+                color = material->Ambient();
+            }
+            else
+            {
+                // Default to white if there's neither texture nor material
+                color = CGrPoint(1.0, 1.0, 1.0);
+            }
         }
-        
 
-        // Now apply lighting to the texture or material color
+        // Apply lighting
         for (int i = 0; i < LightCnt(); ++i)
         {
             const Light& light = GetLight(i);
@@ -151,8 +178,6 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
             if (!m_intersection.Intersect(shadowRay, length, nearest, shadowNearest, t, intersect))
             {
                 // If no intersection, the point is not in shadow for this light
-                
-                // this should add both diffuse and specular
                 color += CalculateLighting(N, material, light, lightDir, intersect, color);
             }
         }

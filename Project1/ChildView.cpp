@@ -19,7 +19,7 @@
 CChildView::CChildView()
 {
 	// Set camera pos
-	m_camera.Set(30., 15., 80., 0., 0., 0., 0., 1., 0.); // I customized this to capture the entire scene
+	m_camera.Set(30., 15., 80., 0., 0., 0., 0., 1., 0.);
 
 	// Init raytracing values
 	m_raytrace = false;
@@ -34,70 +34,14 @@ CChildView::CChildView()
 	m_scene = scene;
 
 	//
-	// Add a Pyramid
-	//
-
-	//// Load texture for pyramid
-	//m_marbletex.LoadFile(L"textures/marble10.bmp");
-
-	//// Define the vertices of the pyramid
-	//double p0[] = { -19, -10,  0 }; // Bottom-left of base
-	//double p1[] = {  -9, -10,  0 }; // Bottom-right of base
-	//double p2[] = {  -9, -10, 10 }; // Top-right of base
-	//double p3[] = { -19, -10, 10 }; // Top-left of base
-	//double p4[] = { -14,   0,  5 }; // Apex
-	//
-	//// Base
-	//CGrPtr<CGrPolygon> base = new CGrPolygon(p0, p1, p2, p3);
-	//base->Texture(&m_marbletex); // Set texture 
-	//base->AddTexVertex3d(p0[0], p0[1], p0[2], 0.0, 0.0); 
-	//base->AddTexVertex3d(p1[0], p1[1], p1[2], 1.0, 0.0); 
-	//base->AddTexVertex3d(p2[0], p2[1], p2[2], 1.0, 1.0);
-	//base->AddTexVertex3d(p3[0], p3[1], p3[2], 0.0, 1.0);
-	//base->ComputeNormal(); // Ensure normal is correct
-	//scene->Child(base);
-	//// Side 1
-	//CGrPtr<CGrPolygon> side1 = new CGrPolygon;
-	//side1->AddVertices3(p1, p0, p4, true); // True to compute normal 
-	//side1->Texture(&m_marbletex); 
-	//side1->AddTexVertex3d(p1[0], p1[1], p1[2], 0.0, 0.0); 
-	//side1->AddTexVertex3d(p0[0], p0[1], p0[2], 1.0, 0.0); 
-	//side1->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
-	//scene->Child(side1);
-	//// Side 2
-	//CGrPtr<CGrPolygon> side2 = new CGrPolygon;
-	//side2->AddVertices3(p2, p1, p4, true);
-	//side2->Texture(&m_marbletex); 
-	//side2->AddTexVertex3d(p2[0], p2[1], p2[2], 0.0, 0.0); 
-	//side2->AddTexVertex3d(p1[0], p1[1], p1[2], 1.0, 0.0); 
-	//side2->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
-	////scene->Child(side2);
-	//// Side 3
-	//CGrPtr<CGrPolygon> side3 = new CGrPolygon;
-	//side3->AddVertices3(p3, p2, p4, true);
-	//side3->Texture(&m_marbletex); 
-	//side3->AddTexVertex3d(p3[0], p3[1], p3[2], 0.0, 0.0); 
-	//side3->AddTexVertex3d(p2[0], p2[1], p2[2], 1.0, 0.0); 
-	//side3->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
-	//scene->Child(side3);
-	//// Side 4
-	//CGrPtr<CGrPolygon> side4 = new CGrPolygon;
-	//side4->AddVertices3(p0, p3, p4, true);
-	//side4->Texture(&m_marbletex);
-	//side4->AddTexVertex3d(p0[0], p0[1], p0[2], 0.0, 0.0); 
-	//side4->AddTexVertex3d(p3[0], p3[1], p3[2], 1.0, 0.0); 
-	//side4->AddTexVertex3d(p4[0], p4[1], p4[2], 0.5, 1.0); 
-	//scene->Child(side4);
-
-	//
 	// Add a Tetrahedron
 	//
 	
 	// Tetrahedron vertices
-	/*double t0[] = {   8, -10, -10 }; // Base vertex 1
-	double t1[] = {  13, -10,  -5 }; // Base vertex 2
-	double t2[] = {   3, -10,  -5 }; // Base vertex 3
-	double t3[] = {   8,  -4,  -5 }; // Apex 
+	double t0[] = {   8, -5,  -3 }; // Base vertex 1
+	double t1[] = {  13, -5,   2 }; // Base vertex 2
+	double t2[] = {   3, -5,   2 }; // Base vertex 3
+	double t3[] = {   8,  4,   2 }; // Apex 
 
 	// Base
 	CGrPtr<CGrPolygon> tetraBase = new CGrPolygon;
@@ -130,7 +74,7 @@ CChildView::CChildView()
 	tetraFace3->AddTexVertex3d(t2[0], t2[1], t2[2], 1.0, 0.0);
 	tetraFace3->AddTexVertex3d(t3[0], t3[1], t3[2], 0.5, 1.0);
 	tetraFace3->ComputeNormal();
-	scene->Child(tetraFace3);*/
+	scene->Child(tetraFace3);
 
 	//
 	// Add a floor
@@ -140,10 +84,10 @@ CChildView::CChildView()
 	m_rwtiletex.LoadFile(L"textures/redwhitetile.bmp");
 	
 	// Define the vertices of the floor
-	double f0[] = { -22, -10, -15 }; // Bottom-left corner 
-	double f1[] = {  15, -10, -15 }; // Bottom-right corner 
-	double f2[] = {  15, -10,  15 }; // Top-right corner 
-	double f3[] = { -22, -10,  15 }; // Top-left corner 
+	double f0[] = { -22, -5, -15 }; // Bottom-left corner 
+	double f1[] = {  15, -5, -15 }; // Bottom-right corner 
+	double f2[] = {  15, -5,  15 }; // Top-right corner 
+	double f3[] = { -22, -5,  15 }; // Top-left corner 
 
 	// Floor
 	CGrPtr<CGrPolygon> floor = new CGrPolygon;
@@ -166,12 +110,13 @@ CChildView::CChildView()
 	// A red box
 	CGrPtr<CGrMaterial> redpaint = new CGrMaterial;
 	redpaint->AmbientAndDiffuse(0.8f, 0.0f, 0.0f);
+	redpaint->Specular(1.0f, 1.0f, 1.0f); // Make red box mirror-like.
+	redpaint->Shininess(100);
 	scene->Child(redpaint);
 
 	CGrPtr<CGrComposite> redbox = new CGrComposite;
 	redpaint->Child(redbox);
-	//redbox->Box(1, 1, 1, 5, 5, 5, &m_woodtex);
-	redbox->Box(1, 1, 1, 5, 5, 5);
+	redbox->Box(-15, -5, 2, 5, 5, 5);
 
 	// A white box
 	CGrPtr<CGrMaterial> whitepaint = new CGrMaterial;
@@ -180,8 +125,7 @@ CChildView::CChildView()
 
 	CGrPtr<CGrComposite> whitebox = new CGrComposite;
 	whitepaint->Child(whitebox);
-	whitebox->Box(-10, -9, -10, 5, 5, 5, &m_worldtex);
-	//whitebox->Box(-10, -10, -10, 5, 5, 5);
+	whitebox->Box(-10, -5, -10, 5, 5, 5, &m_worldtex);
 }
 
 CChildView::~CChildView()
