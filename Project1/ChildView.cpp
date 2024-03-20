@@ -38,10 +38,10 @@ CChildView::CChildView()
 	//
 	
 	// Tetrahedron vertices
-	double t0[] = {   8, -5,  -3 }; // Base vertex 1
-	double t1[] = {  13, -5,   2 }; // Base vertex 2
-	double t2[] = {   3, -5,   2 }; // Base vertex 3
-	double t3[] = {   8,  4,   2 }; // Apex 
+	double t0[] = {   5, -5,  0 }; // Base vertex 1
+	double t1[] = {  10, -5,  5 }; // Base vertex 2
+	double t2[] = {   0, -5,  5 }; // Base vertex 3
+	double t3[] = {   5,  4,  5 }; // Apex 
 
 	// Base
 	CGrPtr<CGrPolygon> tetraBase = new CGrPolygon;
@@ -125,7 +125,7 @@ CChildView::CChildView()
 
 	CGrPtr<CGrComposite> whitebox = new CGrComposite;
 	whitepaint->Child(whitebox);
-	whitebox->Box(-10, -5, -10, 5, 5, 5, &m_worldtex);
+	whitebox->Box(-8, -5, -8, 5, 5, 5, &m_worldtex);
 }
 
 CChildView::~CChildView()

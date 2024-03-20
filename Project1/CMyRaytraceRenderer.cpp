@@ -109,8 +109,8 @@ CGrPoint CMyRaytraceRenderer::Reflect(const CGrPoint& incident, const CGrPoint& 
 
 void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse, const CRayIntersection::Object* ignore)
 {
-    double t; // Will be distance to intersection
-    CGrPoint intersect; // Will by x,y,z location of intersection
+    double t; // Distance to intersection
+    CGrPoint intersect; // x,y,z location of intersection
     const CRayIntersection::Object* nearest; // Pointer to intersecting object
 
     if (m_intersection.Intersect(ray, 1e20, ignore, nearest, t, intersect))
