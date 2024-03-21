@@ -76,6 +76,8 @@ CChildView::CChildView()
 	tetraFace3->ComputeNormal();
 	scene->Child(tetraFace3);
 
+
+
 	//
 	// Add a floor
 	//
@@ -121,6 +123,7 @@ CChildView::CChildView()
 	// A white box
 	CGrPtr<CGrMaterial> whitepaint = new CGrMaterial;
 	whitepaint->AmbientAndDiffuse(0.8f, 0.8f, 0.8f);
+	whitepaint->Specular(1.0f, 1.0f, 1.0f);
 	scene->Child(whitepaint);
 
 	CGrPtr<CGrComposite> whitebox = new CGrComposite;

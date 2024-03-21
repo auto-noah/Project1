@@ -142,16 +142,20 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
         }
         else // Handle non-reflective materials 
         {
+            const float defaultKa = 0.3;
+            float Ka = (material != nullptr) ? *material->Ambient() : defaultKa;
+            
             if (texture != NULL)
             {
                 // Use texture coordinates to sample the texture color
                 CGrPoint textureColor = texture->Sample(texcoord.X(), texcoord.Y());
-                color = textureColor; // Start with the texture color
+                color = textureColor;// * Ka; // Start with the texture color
             }
             else if (material != NULL)
             {
                 // Use the ambient color of the material if there's no texture
-                color = material->Ambient(); 
+                color = material->Ambient();
+                //color = color * Ka;
             }
             else
             {
@@ -177,7 +181,7 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
             if (!m_intersection.Intersect(shadowRay, length, nearest, shadowNearest, t, intersect))
             {
                 // If no intersection, the point is not in shadow for this light
-                color += CalculateLighting(N, material, light, lightDir, intersect, color);
+                color += CalculateLighting(N, material, light, lightDir, intersect, color, ray);
             }
         }
     }
@@ -217,6 +221,10 @@ bool CMyRaytraceRenderer::RendererEnd()
             m_rayimage[r][c * 3] = static_cast<BYTE>(min(max(0, color.X() * 255 * attentuator), 255));
             m_rayimage[r][c * 3 + 1] = static_cast<BYTE>(min(max(0, color.Y() * 255 * attentuator), 255));
             m_rayimage[r][c * 3 + 2] = static_cast<BYTE>(min(max(0, color.Z() * 255 * attentuator), 255));
+
+            //m_rayimage[r][c * 3] = static_cast<BYTE>(color.X() * 255 * attentuator);
+            //m_rayimage[r][c * 3 + 1] = static_cast<BYTE>(color.Y() * 255 * attentuator);
+            //m_rayimage[r][c * 3 + 2] = static_cast<BYTE>(color.Z() * 255 * attentuator);
         }
 
         // Refresh the window every 50 rows to show progress
@@ -235,18 +243,31 @@ bool CMyRaytraceRenderer::RendererEnd()
     return true;
 }
 
-double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPoint& normal, float lightInt, float Ka, float Kd, float Ks, float shininess, const CGrPoint& intersectionPoint)
+double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPoint& normal, float lightInt, float Kd, float Ks, float shininess, const CGrPoint& intersectionPoint, const CRay& ray)
 {
 	// Calculate diffuse and specular components
 
+    CGrPoint lightdirection;
+    CGrPoint viewdirection;
+    if (ray.Origin()[3] == 0)
+    {
+        lightdirection = Normalize3(ray.Origin());
+        viewdirection = Normalize3(ray.Direction());
+    }
+    else
+    {
+        lightdirection = Normalize3(ray.Origin() - intersectionPoint);
+        viewdirection = Normalize3(ray.Direction() - intersectionPoint);
+    }
+
     // View direction
-    CGrPoint viewDir = Normalize3(intersectionPoint - Eye()); // initial from terminal
+    //CGrPoint viewDir = Normalize3(intersectionPoint - Normalize3(Eye())); 
 
     // Halfway direction
-    CGrPoint halfwayDir = Normalize3(lightDir + viewDir);
+    CGrPoint halfwayDir = Normalize3(Normalize3(lightdirection) + viewdirection);
 
     // Diffuse component
-    float diffuse = Kd * lightInt * max(Dot3(lightDir, normal), 0.0);
+    float diffuse = Kd * lightInt * max(Dot3(Normalize3(lightdirection), normal), 0.0);
 
     // Specular component
     float spec = Ks * lightInt * pow(max(Dot3(halfwayDir, normal), 0.0), shininess);
@@ -254,22 +275,20 @@ double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPo
     return new double[2] { diffuse, spec };
 }
 
-CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir, const CGrPoint& intersectionPoint, CGrPoint color)
+CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir, const CGrPoint& intersectionPoint, CGrPoint color, const CRay& ray)
 {
     // Default values for lighting components
-    const float defaultKa = 0.3;
     const float defaultKd = 0.7;
     const float defaultKs = 0.3;
     const float defaultShininess = 50; // This is a guess, adjust as needed
 
     // Check if the material is not NULL, if it is, use the default values
-    float Ka = (material != nullptr) ? *material->Ambient() : defaultKa;
     float Kd = (material != nullptr) ? *material->Diffuse() : defaultKd;
     float Ks = (material != nullptr) ? *material->Specular() : defaultKs;
     float shininess = (material != nullptr) ? material->Shininess() : defaultShininess;
 
     // Call blinnPhongDir with either the material's properties or the default values
-    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1, Ka, Kd, Ks, shininess, intersectionPoint); 
+    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1, Kd, Ks, shininess, intersectionPoint, ray); 
 
     // Create the lighting color based on diffuse and specular components
     CGrPoint colorDiffuse = color;
@@ -287,25 +306,3 @@ CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* 
 }
 
 
-CGrPoint CMyRaytraceRenderer::CalculateIndirectSpecular(const CRay& ray, const CGrPoint& N, const CGrPoint& intersectionPoint, int recurse)
-{
-    CGrPoint specularother(0, 0, 0);
-
-    if (recurse > 1)
-    {
-        // Compute reflected ray direction
-        CGrPoint R = N * (2 * Dot3(N, -ray.Direction())) - (-ray.Direction());
-
-        // Construct reflected ray
-        CRay reflectedRay(intersectionPoint + N * 0.001, R);
-
-        // Compute color recursively for reflected ray
-        CGrPoint reflectedColor;
-        RayColor(reflectedRay, reflectedColor, recurse - 1, nullptr);
-
-        // Calculate specular contribution from other surfaces
-        specularother = reflectedColor;
-    }
-
-    return specularother;
-}

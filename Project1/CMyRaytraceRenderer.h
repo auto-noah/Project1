@@ -34,10 +34,8 @@ public:
 
     void RayColor(const CRay& p_ray, CGrPoint& p_color, int p_recurse, const CRayIntersection::Object* p_ignore);
 
-    CGrPoint CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir, const CGrPoint& intersectionPoint, CGrPoint color);
+    CGrPoint CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir, const CGrPoint& intersectionPoint, CGrPoint color, const CRay& ray);
 
-   CGrPoint CalculateIndirectSpecular(const CRay& ray, const CGrPoint& N, const CGrPoint& intersectionPoint, int recurse);
-
-    double* blinnPhongDir(const CGrPoint& lightDir, const CGrPoint& normal, float lightInt, float Ka, float Kd, float Ks, float shininess, const CGrPoint& intersectionPoint);
+    double* blinnPhongDir(const CGrPoint& lightDir, const CGrPoint& normal, float lightInt, float Kd, float Ks, float shininess, const CGrPoint& intersectionPoint, const CRay& ray);
 };
 
