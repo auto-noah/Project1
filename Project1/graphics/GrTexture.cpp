@@ -35,7 +35,7 @@ using namespace std;
 #define DIB_HEADER_MARKER   ((WORD) ('M' << 8) | 'B')
 const int PADSIZE = 4;
 
-// Get the texture's color where the ray hits
+// Sample the texture's color where the ray hits
 CGrPoint CGrTexture::Sample(double u, double v) const
 {
     // Map texture coordinates to image space

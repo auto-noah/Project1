@@ -38,10 +38,10 @@ CChildView::CChildView()
 	//
 	
 	// Tetrahedron vertices
-	double t0[] = {   5, -5,  0 }; // Base vertex 1
-	double t1[] = {  10, -5,  5 }; // Base vertex 2
-	double t2[] = {   0, -5,  5 }; // Base vertex 3
-	double t3[] = {   5,  4,  5 }; // Apex 
+	double t0[] = {  5, -5, 10 }; // Base vertex 1
+	double t1[] = {  0, -5,  5 };  // Base vertex 2
+	double t2[] = { 10, -5,  5 }; // Base vertex 3
+	double t3[] = {  5,  4,  5 };   // Apex
 
 	// Base
 	CGrPtr<CGrPolygon> tetraBase = new CGrPolygon;
@@ -282,9 +282,9 @@ void CChildView::ConfigureRenderer(CGrRenderer* p_renderer)
 	GLfloat lightDiffuse[] = { 0.6f, 0.6f, 0.6f, 1.0f };
 	GLfloat lightSpecular[] = { 0.7f, 0.7f, 0.7f, 1.0f };
 
-	p_renderer->AddLight(CGrPoint(20, 5, 5, 0),  // Light 1
+	p_renderer->AddLight(CGrPoint(20, 5, 25, 0),   // Light 1
 		ambientColor, lightDiffuse, lightSpecular);
-	p_renderer->AddLight(CGrPoint(-20, 5, 5, 0), // Light 2
+	p_renderer->AddLight(CGrPoint(-20, 5, -25, 0), // Light 2
 		ambientColor, lightDiffuse, lightSpecular);
 }
 

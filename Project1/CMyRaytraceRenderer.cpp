@@ -148,15 +148,10 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
                 CGrPoint textureColor = texture->Sample(texcoord.X(), texcoord.Y());
                 color = textureColor; // Start with the texture color
             }
-            else if (material != NULL)
+            else
             {
                 // Use the ambient color of the material if there's no texture
                 color = material->Ambient(); 
-            }
-            else
-            {
-                // Default to white if there's neither texture nor material
-                color = CGrPoint(1.0, 1.0, 1.0);
             }
         }
 
@@ -183,7 +178,7 @@ void CMyRaytraceRenderer::RayColor(const CRay& ray, CGrPoint& color, int recurse
     }
     else
     {
-        // No intersection: return black as background color
+        // No intersection: return background color
         color = CGrPoint(0, 0, 0); 
     }
 }
@@ -210,7 +205,7 @@ bool CMyRaytraceRenderer::RendererEnd()
             CGrPoint color;
 
             // Compute the color for the ray
-            RayColor(ray, color, 0, NULL); // LEAVE RECURSE VALUE AT ZERO FOR REFLECTIONS
+            RayColor(ray, color, 0, NULL);
 
             // Convert the color to bytes and write to the image buffer
             float attentuator = 0.5; 
@@ -235,7 +230,7 @@ bool CMyRaytraceRenderer::RendererEnd()
     return true;
 }
 
-double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPoint& normal, float lightInt, float Ka, float Kd, float Ks, float shininess, const CGrPoint& intersectionPoint)
+double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPoint& normal, float lightInt, float Kd, float Ks, float shininess, const CGrPoint& intersectionPoint)
 {
 	// Calculate diffuse and specular components
 
@@ -257,19 +252,17 @@ double* CMyRaytraceRenderer::blinnPhongDir(const CGrPoint& lightDir, const CGrPo
 CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* material, const Light& light, const CGrPoint& lightDir, const CGrPoint& intersectionPoint, CGrPoint color)
 {
     // Default values for lighting components
-    const float defaultKa = 0.3;
     const float defaultKd = 0.7;
     const float defaultKs = 0.3;
     const float defaultShininess = 50; // This is a guess, adjust as needed
 
     // Check if the material is not NULL, if it is, use the default values
-    float Ka = (material != nullptr) ? *material->Ambient() : defaultKa;
     float Kd = (material != nullptr) ? *material->Diffuse() : defaultKd;
     float Ks = (material != nullptr) ? *material->Specular() : defaultKs;
     float shininess = (material != nullptr) ? material->Shininess() : defaultShininess;
 
     // Call blinnPhongDir with either the material's properties or the default values
-    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1, Ka, Kd, Ks, shininess, intersectionPoint); 
+    double* diffuseAndSpecular = blinnPhongDir(lightDir, N, 1, Kd, Ks, shininess, intersectionPoint); 
 
     // Create the lighting color based on diffuse and specular components
     CGrPoint colorDiffuse = color;
@@ -286,7 +279,7 @@ CGrPoint CMyRaytraceRenderer::CalculateLighting(const CGrPoint& N, CGrMaterial* 
     return lightingColor;
 }
 
-
+// Didn't work, made CMyRaytraceRenderer::Reflect() instead
 CGrPoint CMyRaytraceRenderer::CalculateIndirectSpecular(const CRay& ray, const CGrPoint& N, const CGrPoint& intersectionPoint, int recurse)
 {
     CGrPoint specularother(0, 0, 0);
